@@ -1,5 +1,5 @@
 import React from 'react';
-import {BrowserRouter, Redirect, Route, Switch} from "react-router-dom";
+import {HashRouter, Redirect, Route, Switch} from "react-router-dom";
 import {DataPage} from "./components/DataPage/DataPage";
 import {LoginPage} from './components/LoginPage/LoginPage';
 import {RegistrationPage} from "./components/RegistrationPage/RegistrationPage";
@@ -13,7 +13,7 @@ function App() {
         <div>
             <AlertState>
                 <AuthProvider>
-                    <BrowserRouter>
+                    <HashRouter>
                         <AppHeader/>
                         <Alert/>
                         <Switch>
@@ -22,7 +22,7 @@ function App() {
                             <Route exact path='/registration' component={RegistrationPage}/>
                             <Redirect to={"/main"}/>
                         </Switch>
-                    </BrowserRouter>
+                    </HashRouter>
                 </AuthProvider>
             </AlertState>
         </div>
