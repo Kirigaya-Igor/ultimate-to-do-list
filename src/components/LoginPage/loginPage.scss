@@ -1,0 +1,47 @@
+.loginPage {
+  background-color: #1A1A1A;
+  min-height: calc(100vh - 80px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .loginPageContent {
+    background-color: #2D2D2D;
+
+    .pageTitle {
+      color: #FF9900;
+      text-align: center;
+      font-weight: bold;
+      font-size: 50px;
+      margin-bottom: 60px;
+      margin-top: 15px;
+    }
+
+    .submitButton {
+      width: 200px;
+      background-color: #FF9900;
+      color: white;
+      font-size: 20px;
+    }
+
+    .separatingText {
+      font-weight: normal;
+      font-size: 30px;
+      line-height: 28px;
+      margin: 25px 0px;
+    }
+
+    .customLink {
+      color: #FF9900;
+      text-decoration: none;
+      font-weight: 300;
+      font-size: 35px;
+      margin-bottom: 30px;
+
+      &:hover {
+        color: cyan;
+      }
+    }
+  }
+}

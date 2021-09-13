@@ -1,0 +1,36 @@
+.registrationPage {
+  background-color: #1A1A1A;
+  min-height: calc(100vh - 80px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .registrationPageContent {
+    background-color: #2D2D2D;
+
+    .pageTitle {
+      color: #FF9900;
+      text-align: center;
+      font-weight: bold;
+      font-size: 50px;
+      margin-bottom: 48px;
+      margin-top: 50px;
+    }
+
+    .submitButton {
+      width: 200px;
+      background-color: #FF9900;
+      color: white;
+      font-size: 20px;
+      margin-bottom: 25px;
+    }
+
+    .customLink {
+      color: white;
+      text-decoration: none;
+      font-size: 50px;
+      position: absolute;
+    }
+  }
+}

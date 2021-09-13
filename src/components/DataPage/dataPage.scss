@@ -1,0 +1,194 @@
+.dataPage {
+  background-color: #1A1A1A;
+  min-height: calc(100vh - 80px);
+
+  .searchPanel {
+    margin: 30px 0px;
+
+    .searchInput {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid black;
+
+      &:active,
+      &:focus {
+        border: 2px solid deeppink;
+        box-shadow: none !important;
+        outline: none !important;
+      }
+    }
+  }
+
+  .dataItem {
+    background-color: #2D2D2D;
+    font-size: 20px;
+    text-align: center;
+    padding: 10px 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+
+    .deleteButton {
+      width: 30px;
+      height: 30px;
+      background-image: url('deleteButton.png');
+      background-size: 30px 30px;
+      border: none;
+      border-radius: 8px;
+      background-color: #2D2D2D;
+      background-repeat: no-repeat;
+    }
+  }
+
+  .addListButton {
+    position: sticky;
+    bottom: 30px;
+    left: 1075px;
+
+    height: 55px;
+    width: 55px;
+    background-image: url('addButton.png');
+    background-size: 55px 55px;
+    border: none;
+    border-radius: 50px;
+    background-color: rgb(0, 0, 0, 0);
+    background-repeat: no-repeat;
+  }
+
+  .modalContent {
+
+    .borderRed {
+      border: 3px solid red !important;
+    }
+
+    .modalListInput {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid black;
+
+      &:active,
+      &:focus {
+        border: 2px solid deeppink;
+        box-shadow: none !important;
+        outline: none !important;
+      }
+    }
+
+    .dividingLine {
+      color: #FF9900;
+      border: 2px solid #FF9900;
+      border-radius: 10px;
+      opacity: 80%;
+      margin-bottom: 15px;
+    }
+
+    .modalItem {
+      display: flex;
+      margin-top: 15px;
+
+      .modalCheckbox {
+
+        input {
+          position: absolute;
+          opacity: 0;
+          cursor: pointer;
+          height: 0;
+          width: 0;
+        }
+
+        span {
+          width: 25px;
+          height: 25px;
+          display: block;
+          border: 2px solid black;
+        }
+
+        input:checked + span {
+          border: 2px solid #00FF0A;
+          background-image: url("activeCheckbox.png");
+        }
+      }
+
+      .modalTaskInput {
+        margin-left: 5px;
+        padding-left: 5px;
+        font-size: 20px;
+        width: 100%;
+        border: none;
+        border-bottom: 1px solid #FF9900;
+        background: #2D2D2D;
+        color: white;
+
+        &:active,
+        &:focus {
+          border-bottom: 1px solid #FF9900;
+          box-shadow: none !important;
+          outline: none !important;
+        }
+
+        &::-webkit-input-placeholder {
+          color: white;
+          opacity: 70%;
+        }
+      }
+
+      .modalTaskContent {
+        font-size: 20px;
+        margin-left: 5px;
+        padding-left: 5px;
+        width: 100%;
+        border: none;
+        border-bottom: 1px solid #FF9900;
+        background: #2D2D2D;
+        color: white;
+      }
+    }
+
+    .buttons1 {
+      margin-top: 20px;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: flex-end;
+
+      .cancelButton {
+        color: white;
+        border: none;
+        min-width: 75px;
+        border-radius: 8px;
+        background-color: #FF3D00;
+      }
+
+      .addButton {
+        color: white;
+        margin-left: 30px;
+        min-width: 75px;
+        border: none;
+        border-radius: 8px;
+        background-color: #FF9900;
+      }
+    }
+
+    .buttons2 {
+      display: flex;
+      justify-content: space-between;
+
+      .cancelButton {
+        color: #FF9900;
+        font-size: 25px;
+        border: none;
+        min-width: 100px;
+        border-radius: 8px;
+        background-color: #2D2D2D;
+      }
+
+      .saveButton {
+        color: white;
+        font-size: 25px;
+        margin-left: 30px;
+        min-width: 100px;
+        border: none;
+        border-radius: 8px;
+        background-color: #FF9900;
+      }
+    }
+  }
+}
