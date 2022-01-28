@@ -1,18 +1,17 @@
-import React, {FC, FormEvent, useContext, useEffect, useState} from 'react'
+import React, { FC, FormEvent, useContext, useEffect, useState } from 'react'
 import './dataPage.scss'
-import {AddOrUpdateList} from "./AddOrUpdateList";
-import {APIMethods, tasksType, toDoListType} from "../../API/API";
-import {Redirect, useHistory} from "react-router-dom";
-import queryString from "querystring";
-import {FilterPanel} from "./FilterPanel";
-import {Loader} from "../Loader/Loader";
-import {AlertContext} from "../alert/alertState";
-import {catchError} from "../common/catchError";
-
-type QueryParamsType = { _sort?: string }
+import { AddOrUpdateList } from "./AddOrUpdateList";
+import { APIMethods, tasksType, toDoListType } from "../../API/API";
+import { FilterPanel } from "./FilterPanel";
+import { Loader } from "../Loader/Loader";
+import { AlertContext } from "../alert/alertState";
+import { catchError } from "../common/catchError";
+import { Redirect } from 'react-router-dom';
+import { FirebaseContext } from '../Firebase/FirebaseProvider';
 
 export const DataPage: FC = () => {
 
+    const [dbIsEmpty, setDbIsEmpty] = useState<boolean>(true)
     const [isLoading, setIsLoading] = useState<boolean>(true)
     const [addIsActive, setAddIsActive] = useState<boolean>(false)
     const [updateIsActive, setUpdateIsActive] = useState<boolean>(false)
@@ -21,23 +20,38 @@ export const DataPage: FC = () => {
     const [toDoList, setToDoList] = useState<Array<toDoListType>>([])
     const [helpToDoList, setHelpToDoList] = useState<Array<toDoListType>>([])
     const [tasks, setTasks] = useState<Array<tasksType>>([])
-    const [activePage, setActivePage] = useState<boolean>(true)
     const [selectItem, setSelectItem] = useState<toDoListType>({} as toDoListType)
-    const [sortType, setSortType] = useState<string>('created_at')
     const [searchText, setSearchText] = useState<string>('')
-    const history = useHistory()
     // @ts-ignore
-    const {showAlert} = useContext(AlertContext);
+    const { showAlert } = useContext(AlertContext)
+    // @ts-ignore
+    const {currentUser} = useContext(FirebaseContext)
 
-    const getData = (sortType?: string) => {
-        APIMethods.getToDoList(sortType)
+    const getData = () => {
+        APIMethods.getToDoList(currentUser.uid)
             .then((res) => {
-                setToDoList(res.data)
-                setHelpToDoList(res.data)
-                setIsLoading(false)
+                if (res.data !== null) {
+                    const appData = Object.keys(res.data).map(key => {
+                        return {
+                            //@ts-ignore
+                            ...res.data[key],
+                            id: key
+                        }
+                    })
+    
+                    setToDoList(appData)
+                    setHelpToDoList(appData)
+                    setIsLoading(false)
+                    setDbIsEmpty(false)
+                } else if (res.data === null) {
+                    setIsLoading(false)
+                    setDbIsEmpty(true)
+                }
+                
             })
             .catch((error) => {
                 setIsLoading(false)
+                console.log(error)
                 catchError(error, showAlert)
             })
     }
@@ -51,39 +65,24 @@ export const DataPage: FC = () => {
     }
 
     useEffect(() => {
-        const parsed = queryString.parse(history.location.search.substr(1)) as QueryParamsType
-        if (!!parsed._sort) setSortType(parsed._sort)
-    }, [])
-
-    useEffect(() => {
-        if (activePage && localStorage.getItem('token')) {
-            getData(sortType)
-        }
-        return () => setActivePage(false)
-    }, [activePage, sortType])
-
-    useEffect(() => {
-        if (localStorage.getItem('token')) {
-            const query: QueryParamsType = {}
-            query._sort = sortType
-            history.push({
-                pathname: '/main',
-                search: queryString.stringify(query)
-            })
-        }
-    }, [sortType, history])
+        currentUser && getData()
+        return () => {
+            setToDoList([])
+            setHelpToDoList([])
+        };
+    }, [currentUser])
 
     useEffect(() => {
         searchTitle(searchText)
     }, [searchText])
 
-    if (!localStorage.getItem('token')) {
-        return <Redirect to="/login"/>;
-    }
-
     const clearData = () => {
         setListName('')
         setTasks([])
+    }
+
+    if (!currentUser) {
+        return <Redirect to="/login" />;
     }
 
     const addOrUpdateList = async (apiMethod: any, id?: number) => {
@@ -91,9 +90,10 @@ export const DataPage: FC = () => {
             setEmptyListName(true)
         } else {
             setEmptyListName(false)
-            const newList = {name: listName, task: tasks}
+            let today = new Date()
+            const newList = { name: listName, task: tasks, created: today.toISOString().split('T')[0].split("-").reverse().join(".") }
             try {
-                await apiMethod(newList, id && id)
+                currentUser && await apiMethod(currentUser.uid, newList, id && id)
                 getData()
                 clearData()
             } catch (error: any) {
@@ -126,11 +126,12 @@ export const DataPage: FC = () => {
     const deleteList = async (id: number) => {
         try {
             setIsLoading(true)
-            APIMethods.deleteList(id)
+            currentUser && APIMethods.deleteList(currentUser.uid, id)
                 .then(() => {
                     setToDoList(toDoList.filter((item) => item.id !== id))
                     setHelpToDoList(helpToDoList.filter((item) => item.id !== id))
                     setIsLoading(false)
+                    if (helpToDoList.length === 1) setDbIsEmpty(true)
                 })
                 .catch((error) => {
                     setIsLoading(false)
@@ -145,61 +146,62 @@ export const DataPage: FC = () => {
     return (
         <div className='dataPage'>
             <AddOrUpdateList isActive={addIsActive} setIsActive={setAddIsActive} addList={addList}
-                             emptyListName={emptyListName} listName={listName} setListName={setListName}
-                             setEmptyListName={setEmptyListName} tasks={tasks} setTasks={setTasks}
-                             clearData={clearData} form1='form1' form2='form2'/>
+                emptyListName={emptyListName} listName={listName} setListName={setListName}
+                setEmptyListName={setEmptyListName} tasks={tasks} setTasks={setTasks}
+                clearData={clearData} form1='form1' form2='form2' />
 
             <AddOrUpdateList isActive={updateIsActive} setIsActive={setUpdateIsActive} addList={updateList}
-                             emptyListName={emptyListName} listName={listName} setListName={setListName}
-                             setEmptyListName={setEmptyListName} tasks={tasks} setTasks={setTasks}
-                             clearData={clearData} form1='form3' form2='form4'/>
+                emptyListName={emptyListName} listName={listName} setListName={setListName}
+                setEmptyListName={setEmptyListName} tasks={tasks} setTasks={setTasks}
+                clearData={clearData} form1='form3' form2='form4' />
 
             <div className='container-fluid'>
                 <div className='row text-white d-flex justify-content-center align-items-start'>
 
-                    <FilterPanel sortType={sortType} setSortType={setSortType}
-                                 setActivePage={setActivePage} setIsLoading={setIsLoading} searchText={searchText}
-                                 setSearchText={setSearchText}/>
+                    <FilterPanel searchText={searchText} setSearchText={setSearchText} />
 
-                    {isLoading ? <Loader/> : helpToDoList.map((item) => {
-                            const created = item.created_at
-                            const date = `${created.slice(8, 10)}-${created.slice(5, 7)}-${created.slice(0, 4)}`
-                            let helpArray = []
-                            item.task.forEach((i) => {
-                                if (i.isDone === true) {
-                                    helpArray.push(i)
-                                }
-                            })
-                            const allT = item.task.length
-                            const completedT = helpArray.length
-                            const UncompletedT = allT - completedT
-                            return (
-                                <div key={item.id} className='col-md-8 container-fluid'
-                                     onClick={() => {
-                                         setUpdateIsActive(true)
-                                         setSelectItem(item)
-                                         setListName(item.name)
-                                         setTasks(item.task)
-                                     }}>
-                                    <div className='row dataItem d-lg-flex justify-content-between align-items-center'>
-                                        <div className='col-lg-3'>{item.name}</div>
-                                        <div className='col-lg-3'>{`Created at: ${date}`}</div>
-                                        <div
-                                            className='col-lg-5'>{`Completed: ${completedT}, Uncompleted: ${UncompletedT}, All: ${allT}`}</div>
-                                        <div className='col-lg-1'>
-                                            <button className='deleteButton' onClick={(e) => {
-                                                e.stopPropagation()
-                                                deleteList(item.id)
-                                            }}>
-                                            </button>
-                                        </div>
+                    {isLoading ? <Loader /> : dbIsEmpty ? <h1 className='text-white text-center'>Your to-do list is empty</h1> : helpToDoList.map((item) => {
+                        let helpArray = []
+                        item.task.forEach((i) => {
+                            if (i.isDone === true) {
+                                helpArray.push(i)
+                            }
+                        })
+                        const allT = item.task.length
+                        const completedT = helpArray.length
+                        const UncompletedT = allT - completedT
+                        return (
+                            <div key={item.id} className='col-md-8 container-fluid'
+                                onClick={() => {
+                                    setUpdateIsActive(true)
+                                    setSelectItem(item)
+                                    setListName(item.name)
+                                    setTasks(item.task)
+                                }}>
+                                <div className='row dataItem d-lg-flex justify-content-between align-items-center'>
+                                    <div className='col-lg-3'>{item.name}</div>
+                                    <div className='col-lg-3'>{`Created at: ${item.created}`}</div>
+                                    <div
+                                        className='col-lg-5'>{`Completed: ${completedT}, Uncompleted: ${UncompletedT}, All: ${allT}`}</div>
+                                    <div className='col-lg-1'>
+                                        <button className='deleteButton' onClick={(e) => {
+                                            e.stopPropagation()
+                                            deleteList(item.id)
+                                        }}>
+                                        </button>
                                     </div>
                                 </div>
-                            )
-                        })
+                            </div>
+                        )
+                    })
                     }
                 </div>
-                <button className='addListButton' onClick={() => setAddIsActive(true)}></button>
+                <div className='row d-flex justify-content-center'>
+                    <div className='col-md-8 position-relative'>
+                        <button className='addListButton' onClick={() => setAddIsActive(true)}></button>
+                    </div>
+                </div>
+
             </div>
         </div>
     )

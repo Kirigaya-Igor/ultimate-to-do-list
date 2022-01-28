@@ -4,15 +4,15 @@ import {DataPage} from "./components/DataPage/DataPage";
 import {LoginPage} from './components/LoginPage/LoginPage';
 import {RegistrationPage} from "./components/RegistrationPage/RegistrationPage";
 import {AppHeader} from "./components/AppHeader/AppHeader";
-import {AuthProvider} from "./components/IsAuth/IsAuth";
 import {AlertState} from './components/alert/alertState';
 import {Alert} from "./components/alert/alert";
+import { FirebaseProvider } from './components/Firebase/FirebaseProvider';
 
 function App() {
     return (
         <div>
             <AlertState>
-                <AuthProvider>
+                <FirebaseProvider>
                     <HashRouter>
                         <AppHeader/>
                         <Alert/>
@@ -23,7 +23,7 @@ function App() {
                             <Redirect to={"/main"}/>
                         </Switch>
                     </HashRouter>
-                </AuthProvider>
+                </FirebaseProvider>
             </AlertState>
         </div>
     );

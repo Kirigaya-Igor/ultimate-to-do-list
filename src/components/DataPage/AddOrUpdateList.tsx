@@ -111,7 +111,8 @@ export const AddOrUpdateList: FC<AddNewListTypes> =
                                     clearData()
                                 }}
                         >CANCEL</button>
-                        <button className='saveButton' type='submit' form={form1}>SAVE</button>
+                        {listName !== '' && tasks.length !== 0 ? <button className='saveButton' type='submit' form={form1}>SAVE</button> 
+                        : <button disabled className='saveButton opacity-50' type='submit' form={form1}>SAVE</button> }
                     </div>
                 </div>
             </ModalWindow>

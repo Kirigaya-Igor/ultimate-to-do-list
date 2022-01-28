@@ -1,18 +1,20 @@
-import React, {FC, useContext} from 'react'
-import './appHeader.scss'
-import {AuthContext} from "../IsAuth/IsAuth";
-import {useHistory} from "react-router-dom";
+import { signOut } from "firebase/auth";
+import React, { FC, useContext } from 'react';
+import { FirebaseContext } from '../Firebase/FirebaseProvider';
+import './appHeader.scss';
 
 export const AppHeader: FC = () => {
 
     // @ts-ignore
-    const {currentUser, setCurrentUser} = useContext(AuthContext);
-    const history = useHistory()
+    const {currentUser, setCurrentUser, auth} = useContext(FirebaseContext)
 
     const logout = () => {
-        localStorage.removeItem('token')
-        setCurrentUser(false)
-        history.push('/login')
+        signOut(auth).then(() => {
+            setCurrentUser(false)
+            // history.push('/login')
+          }).catch((error) => {
+            console.log('log out error')
+          });
     }
 
     return (
