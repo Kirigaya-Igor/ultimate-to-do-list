@@ -11,7 +11,7 @@ export const AppHeader: FC = () => {
     const logout = () => {
         signOut(auth).then(() => {
             setCurrentUser(false)
-            // history.push('/login')
+            localStorage.removeItem('userId')
           }).catch((error) => {
             console.log('log out error')
           });

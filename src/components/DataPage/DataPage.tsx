@@ -81,7 +81,7 @@ export const DataPage: FC = () => {
         setTasks([])
     }
 
-    if (!currentUser) {
+    if (!localStorage.getItem('userId')) {
         return <Redirect to="/login" />;
     }
 

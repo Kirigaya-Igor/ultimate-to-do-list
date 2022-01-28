@@ -33,6 +33,7 @@ export const LoginPage: FC = () => {
         try {
             signInWithEmailAndPassword(auth, userData.email, userData.password)
                 .then((userCredential) => {
+                    localStorage.setItem('userId', userCredential.user.uid)
                     setCurrentUser(userCredential.user)
                     setIsLoading(false)
                 })

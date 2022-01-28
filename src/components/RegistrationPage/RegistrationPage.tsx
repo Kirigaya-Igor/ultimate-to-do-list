@@ -35,6 +35,7 @@ export const RegistrationPage: FC = () => {
         try {
             createUserWithEmailAndPassword(auth, newUser.email, newUser.password)
                 .then((userCredential) => {
+                    localStorage.setItem('userId', userCredential.user.uid)
                     setCurrentUser(userCredential.user)
                     setIsLoading(false)
                 })
